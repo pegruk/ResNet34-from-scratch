@@ -6,9 +6,9 @@ project follows the approach used in the
 assemble the architecture ourselves, then transfer the official torchvision
 ImageNet-1K weights and verify that both models produce the same output.
 
-The model code does not instantiate or wrap torchvision's ResNet. Torchvision is
-used only for its pretrained checkpoint, preprocessing recipe, and ImageNet
-class labels.
+The custom model does not wrap torchvision's ResNet. Torchvision is used as a
+temporary source for the official checkpoint, plus the preprocessing recipe and
+ImageNet class labels.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ project with its test dependencies:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,pretrained]"
 ```
 
 ## Inference
@@ -47,7 +47,7 @@ The model can also be used directly:
 
 ```python
 import torch
-from src import ResNet34
+from resnet34 import ResNet34
 
 model = ResNet34.from_pretrained()
 with torch.inference_mode():
@@ -63,9 +63,21 @@ size. Pretrained ImageNet weights require `num_classes=1000`.
 pytest -q
 ```
 
-The suite checks individual module behavior, output shapes, the canonical
-parameter count, and numerical parity with torchvision after transferring the
-pretrained state.
+The default suite checks individual module behavior, output shapes, parameter
+count, and state-loading validation without network access. To run the
+torchvision parity test, which downloads the pretrained checkpoint if needed,
+run:
+
+```bash
+pytest -q -m integration
+```
+
+The project can be installed without the optional pretrained workflow when only
+the randomly initialized model is needed:
+
+```bash
+python -m pip install -e "."
+```
 
 ## References
 

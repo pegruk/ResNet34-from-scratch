@@ -2,7 +2,7 @@ import pytest
 import torch
 from torch import nn
 
-from src import AveragePool, BatchNorm2d, ResidualBlock, Sequential
+from resnet34 import AveragePool, BatchNorm2d, ResidualBlock, Sequential
 
 
 def test_sequential_matches_pytorch() -> None:

@@ -11,7 +11,9 @@ class Sequential(nn.Module):
 
     def __init__(self, *modules: nn.Module) -> None:
         super().__init__()
-        self._modules.update(OrderedDict((str(index), module) for index, module in enumerate(modules)))
+        self._modules.update(
+            OrderedDict((str(index), module) for index, module in enumerate(modules))
+        )
 
     def forward(self, x: Tensor) -> Tensor:
         for module in self:

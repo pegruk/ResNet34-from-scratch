@@ -10,7 +10,10 @@ import torch
 from PIL import Image
 from torchvision.models import ResNet34_Weights
 
-from src import ResNet34
+from resnet34 import ResNet34
+
+
+MAX_IMAGE_BYTES = 25 * 1024 * 1024
 
 
 def load_image(source: str) -> Image.Image:
@@ -18,16 +21,24 @@ def load_image(source: str) -> Image.Image:
 
     if urlparse(source).scheme in {"http", "https"}:
         with urlopen(source, timeout=30) as response:  # noqa: S310 - explicit CLI input
-            image = Image.open(BytesIO(response.read()))
+            payload = response.read(MAX_IMAGE_BYTES + 1)
+        if len(payload) > MAX_IMAGE_BYTES:
+            raise ValueError(
+                f"image exceeds the {MAX_IMAGE_BYTES // (1024 * 1024)} MiB limit"
+            )
+        with Image.open(BytesIO(payload)) as image:
+            return image.convert("RGB")
     else:
-        image = Image.open(Path(source).expanduser())
-    return image.convert("RGB")
+        with Image.open(Path(source).expanduser()) as image:
+            return image.convert("RGB")
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("image", help="local image path or HTTP(S) URL")
-    parser.add_argument("--top-k", type=int, default=5, help="number of predictions to display")
+    parser.add_argument(
+        "--top-k", type=int, default=5, help="number of predictions to display"
+    )
     parser.add_argument(
         "--device",
         choices=("auto", "cpu", "cuda"),
@@ -42,7 +53,9 @@ def main() -> None:
     if not 1 <= args.top_k <= 1000:
         raise SystemExit("--top-k must be between 1 and 1000")
 
-    device = "cuda" if args.device == "auto" and torch.cuda.is_available() else args.device
+    device = (
+        "cuda" if args.device == "auto" and torch.cuda.is_available() else args.device
+    )
     if device == "auto":
         device = "cpu"
     if device == "cuda" and not torch.cuda.is_available():
@@ -58,7 +71,9 @@ def main() -> None:
     scores, class_ids = probabilities.topk(args.top_k)
 
     categories = weights.meta["categories"]
-    for rank, (score, class_id) in enumerate(zip(scores, class_ids, strict=True), start=1):
+    for rank, (score, class_id) in enumerate(
+        zip(scores, class_ids, strict=True), start=1
+    ):
         print(f"{rank:>2}. {categories[class_id]:<30} {score.item():.2%}")
 
 

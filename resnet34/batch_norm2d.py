@@ -8,7 +8,9 @@ from torch import Tensor, nn
 class BatchNorm2d(nn.Module):
     """Normalize NCHW activations and maintain running channel statistics."""
 
-    def __init__(self, num_features: int, eps: float = 1e-5, momentum: float = 0.1) -> None:
+    def __init__(
+        self, num_features: int, eps: float = 1e-5, momentum: float = 0.1
+    ) -> None:
         super().__init__()
         if num_features <= 0:
             raise ValueError("num_features must be positive")

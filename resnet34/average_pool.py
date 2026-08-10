@@ -1,4 +1,4 @@
-"""Global average pooling used by ResNet."""
+"""Global average pooling used by ResNet-34."""
 
 import torch
 from torch import Tensor, nn

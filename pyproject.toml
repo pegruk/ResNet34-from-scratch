@@ -7,15 +7,16 @@ name = "resnet34-from-scratch"
 version = "0.1.0"
 description = "An educational ResNet-34 implementation in PyTorch"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11"
-dependencies = [
-    "torch>=2.8,<3.0",
+dependencies = ["torch>=2.8,<3.0"]
+
+[project.optional-dependencies]
+pretrained = [
     "torchvision>=0.23,<0.24",
     "pillow>=11,<13",
 ]
-
-[project.optional-dependencies]
-dev = ["pytest>=8,<9"]
+dev = ["pytest>=8,<9", "ruff>=0.15,<0.16"]
 
 [tool.setuptools]
-packages = ["src"]
+packages = ["resnet34"]

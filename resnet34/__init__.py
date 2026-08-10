@@ -1,4 +1,4 @@
-"""A from-scratch, PyTorch-based ResNet-34 implementation."""
+"""An educational, PyTorch-based ResNet-34 implementation."""
 
 from .average_pool import AveragePool
 from .batch_norm2d import BatchNorm2d
